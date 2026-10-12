@@ -1,0 +1,507 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>How AI Recognizes Sounds and Movement</title><style>*{box-sizing:border-box}
+html{background:#eceef9}
+:root{--ink:#1c2250;--muted:#4b5384;--card:#fff;--line:#d9def3;--indigo:#4a52c9;--moon:#f3c44f;--teal:#1fa79c;--coral:#e9604f;--lilac:#8a68dc;--sky:#3a8ee0;--soft:#f3f5fe}
+html{scroll-behavior:smooth}
+body{margin:0;font-family:Arial,Helvetica,sans-serif;font-size:19px;line-height:1.5;color:var(--ink);min-height:100vh;
+background:
+radial-gradient(circle at calc(100% - 90px) 120px,#fffdf3 0 48px,#fbeeb9 49px 54px,rgba(251,238,185,.5) 55px 105px,rgba(251,238,185,0) 230px),
+radial-gradient(circle at 8% 22%,#b3bcea 0 2px,transparent 3px),
+radial-gradient(circle at 22% 9%,#c7b8ef 0 2px,transparent 3px),
+radial-gradient(circle at 41% 16%,#b3bcea 0 1.5px,transparent 2.5px),
+radial-gradient(circle at 63% 7%,#c7b8ef 0 2px,transparent 3px),
+radial-gradient(circle at 74% 28%,#b3bcea 0 1.5px,transparent 2.5px),
+radial-gradient(circle at 5% 64%,#c7b8ef 0 2px,transparent 3px),
+radial-gradient(circle at 95% 58%,#b3bcea 0 2px,transparent 3px),
+radial-gradient(circle at 33% 88%,#c7b8ef 0 1.5px,transparent 2.5px),
+radial-gradient(circle at 82% 92%,#b3bcea 0 2px,transparent 3px),
+linear-gradient(170deg,#edf1fc 0%,#e6e5f8 55%,#f3eefb 100%);
+background-attachment:fixed}
+.top{position:sticky;top:0;z-index:30;display:flex;align-items:center;gap:14px;padding:10px 22px;background:rgba(255,255,255,.85);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+.brand{font-size:14px;font-weight:700;color:var(--indigo);letter-spacing:.3px}
+.lvl{font-size:14px;color:var(--muted);flex:1}
+.homebtn{font:inherit;font-size:15px;font-weight:700;background:#fff;border:2px solid var(--line);color:var(--indigo);border-radius:12px;padding:6px 14px;cursor:pointer}
+main{max-width:1120px;margin:0 auto;padding:24px 18px 70px}
+.page{display:none;animation:fade .35s}
+.page.show{display:block}
+@keyframes fade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
+.luna{display:inline-block;width:110px}
+.luna svg{width:100%;height:auto;display:block}
+.big-luna{width:170px;animation:float 3.2s ease-in-out infinite}
+.title-card{min-height:76vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:14px}
+.title-card h1{font-size:clamp(36px,5.4vw,60px);line-height:1.15;margin:6px 0 10px;max-width:900px}
+.chap{font-size:17px;font-weight:700;color:var(--lilac);background:#fff;border:2px solid var(--line);border-radius:999px;padding:6px 18px}
+.menu-h{font-size:36px;margin:4px 0 4px}
+.menu-sub{color:var(--muted);margin:0 0 18px}
+.grp-h{display:inline-block;font-weight:700;font-size:18px;padding:6px 16px;border-radius:999px;background:#fff;border:2px solid var(--line);margin:18px 0 12px}
+.mgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(235px,1fr));gap:16px}
+.mcard{font:inherit;position:relative;text-align:left;background:#fff;border:1px solid var(--line);border-top:7px solid var(--indigo);border-radius:20px;padding:16px 18px;cursor:pointer;display:flex;flex-direction:column;gap:6px;box-shadow:0 6px 20px rgba(60,70,150,.08);transition:transform .15s,box-shadow .15s;color:var(--ink)}
+.mcard:hover{transform:translateY(-4px);box-shadow:0 12px 26px rgba(60,70,150,.15)}
+.mcard.g-Do{border-top-color:var(--teal)}.mcard.g-Wrap{border-top-color:var(--coral)}
+.mnum{position:absolute;top:12px;right:14px;width:30px;height:30px;border-radius:50%;background:var(--soft);display:grid;place-items:center;font-weight:700;font-size:15px;color:var(--muted)}
+.mcard.done .mnum{background:var(--moon);color:var(--ink)}
+.mcard.done .mnum::after{content:"⭐";position:absolute;font-size:14px;top:-8px;right:-8px}
+.mic{font-size:40px;line-height:1}
+.mt{font-size:21px;font-weight:700}
+.mm{font-size:15px;color:var(--muted)}
+.sec-head{display:flex;align-items:center;gap:16px;margin-bottom:18px}
+.sec-ic{font-size:42px;min-width:76px;height:76px;border-radius:22px;background:#fff;display:grid;place-items:center;border:2px solid var(--line)}
+.sec-kick{font-size:15px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.6px}
+.sec-title{font-size:34px;margin:0;line-height:1.2}
+.badges{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 14px}
+.badge{display:inline-flex;align-items:center;gap:6px;background:linear-gradient(90deg,#4a52c9,#8a68dc);color:#fff;border-radius:999px;padding:4px 13px;font-size:13px;font-weight:700}
+.badge.b2{background:linear-gradient(90deg,#1fa79c,#3a8ee0)}
+.badge.b3{background:linear-gradient(90deg,#e9604f,#f39a3d)}
+.card{background:#fff;border:1px solid var(--line);border-radius:22px;padding:22px 24px;box-shadow:0 6px 22px rgba(60,70,150,.08);margin-bottom:18px}
+.card h3{margin:0 0 10px;font-size:25px}
+.card p{margin:6px 0}
+.muted{color:var(--muted)}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(290px,1fr));gap:18px}
+.grid3{display:grid;grid-template-columns:repeat(auto-fit,minmax(225px,1fr));gap:16px}
+.btn{font:inherit;font-weight:700;border:none;border-radius:14px;padding:12px 20px;background:var(--indigo);color:#fff;cursor:pointer;box-shadow:0 4px 0 #343b9e;transition:transform .1s,box-shadow .1s}
+.btn:active{transform:translateY(3px);box-shadow:0 1px 0 #343b9e}
+.btn:disabled{opacity:.5;cursor:default}
+.btn.teal{background:var(--teal);box-shadow:0 4px 0 #13786f}
+.btn.coral{background:var(--coral);box-shadow:0 4px 0 #b4402f}
+.btn.lilac{background:var(--lilac);box-shadow:0 4px 0 #6447b3}
+.btn.moon{background:var(--moon);color:var(--ink);box-shadow:0 4px 0 #c99a20}
+.btn.ghost{background:#fff;color:var(--indigo);border:2px solid var(--line);box-shadow:none}
+.btn.big{font-size:24px;padding:16px 36px;border-radius:18px}
+.btn.sm{font-size:16px;padding:8px 14px;border-radius:11px}
+.row{display:flex;gap:12px;flex-wrap:wrap;align-items:center;margin-top:14px}
+.sec-nav{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-top:28px}
+.slide{display:none;text-align:center;padding:10px 6px}
+.slide.on{display:block;animation:fade .4s}
+.scene{font-size:72px;line-height:1.2;margin:10px 0 14px;letter-spacing:6px}
+.story-text{font-size:24px;max-width:820px;margin:0 auto}
+.big-q{font-weight:700;color:var(--indigo)}
+.sl-ctrl{display:flex;justify-content:space-between;align-items:center;margin-top:18px;gap:10px}
+.dots{display:flex;gap:8px}
+.dots i{width:12px;height:12px;border-radius:50%;background:var(--line)}
+.dots i.on{background:var(--moon);transform:scale(1.25)}
+.flip{perspective:900px;cursor:pointer;min-height:230px}
+.flip .in{position:relative;width:100%;min-height:230px;transition:transform .6s;transform-style:preserve-3d}
+.flip.on .in{transform:rotateY(180deg)}
+.flip .f,.flip .b{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;border-radius:22px;padding:18px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;border:1px solid var(--line)}
+.flip .f{background:#fff;box-shadow:0 6px 18px rgba(60,70,150,.08)}
+.flip .f .big{font-size:62px;line-height:1.1}
+.flip .f b{font-size:23px;margin-top:6px}
+.flip .f small{color:var(--muted);font-size:14px;margin-top:6px}
+.flip .b{background:linear-gradient(160deg,#4a52c9,#8a68dc);color:#fff;transform:rotateY(180deg);font-size:20px}
+.pipeline{display:flex;align-items:stretch;gap:10px;flex-wrap:wrap;justify-content:center}
+.pstep{background:var(--soft);border-radius:18px;padding:16px;text-align:center;min-width:170px;flex:1}
+.pstep .big{font-size:44px;line-height:1.2}
+.pstep b{display:block;font-size:21px}
+.pstep span{display:block;color:var(--muted);font-size:16px}
+.parrow{font-size:34px;color:var(--lilac);align-self:center}
+.chip{font:inherit;background:#fff;border:2px solid var(--line);border-radius:16px;padding:10px 12px;cursor:pointer;display:inline-flex;flex-direction:column;align-items:center;min-width:100px;color:var(--ink);transition:transform .12s}
+.chip:hover{transform:translateY(-2px)}
+.chip .big{font-size:42px;line-height:1.15}
+.chip small{font-size:15px;color:var(--muted)}
+.chip.sel{border-color:var(--moon);box-shadow:0 0 0 4px #fbe6a4}
+.chip.ok{border-color:var(--teal);background:#e6f7f5}
+.chip.bad{border-color:var(--coral);background:#fdecea}
+.tray{display:flex;flex-wrap:wrap;gap:10px;padding:14px;background:var(--soft);border-radius:18px;border:2px dashed var(--line);min-height:96px}
+.buckets{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px;margin-top:14px}
+.bucket{background:#fff;border:3px solid var(--line);border-radius:18px;padding:12px;min-height:150px;cursor:pointer}
+.bucket:hover{border-color:var(--indigo)}
+.bh{font-weight:700;font-size:20px;margin-bottom:8px}
+.bin{display:flex;flex-wrap:wrap;gap:8px}
+.fb{font-weight:700;font-size:20px;min-height:28px}
+.fb.good{color:#13786f}.fb.oops{color:#b4402f}
+.qcard{background:#fff;border:1px solid var(--line);border-radius:18px;padding:16px 20px;margin-bottom:14px}
+.qn{display:inline-block;background:var(--moon);border-radius:10px;padding:2px 10px;font-weight:700;font-size:14px}
+.qq{font-size:21px;font-weight:700;margin:8px 0}
+.opts{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px}
+.opt{font:inherit;text-align:left;background:var(--soft);border:2px solid var(--line);border-radius:14px;padding:12px 14px;cursor:pointer;color:var(--ink)}
+.opt:hover{border-color:var(--indigo)}
+.opt.right{background:#e3f6f3;border-color:var(--teal)}
+.opt.wrong{background:#fdebe8;border-color:var(--coral)}
+.why{margin:8px 0 0;color:var(--muted)}
+.score-box{text-align:center;font-size:26px;font-weight:700;background:linear-gradient(90deg,#fff6d6,#efeaff);border-radius:18px;padding:18px}
+.tip{background:#fff8e1;border-left:6px solid var(--moon);border-radius:12px;padding:12px 16px;margin:12px 0;font-size:17px}
+.tip.teacher{background:#eef0ff;border-left-color:var(--indigo)}
+.meter{height:24px;background:#eceffa;border-radius:999px;overflow:hidden;border:1px solid var(--line)}
+.meter>i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--teal),var(--sky));transition:width .45s}
+.blk{display:inline-flex;align-items:center;gap:8px;padding:8px 13px;border-radius:12px;color:#fff;font-weight:700;font-size:18px}
+.blk select,.blk input{font:inherit;font-size:17px;border-radius:8px;border:none;padding:4px 8px;color:var(--ink);background:#fff}
+.blk.if{background:#ef8d2c}.blk.and{background:#c77700}.blk.then{background:var(--indigo)}.blk.when{background:#d9a20a}.blk.do{background:var(--teal)}.blk.say{background:var(--lilac)}
+.rule{background:var(--soft);border-radius:16px;padding:10px 12px;margin-bottom:10px;display:flex;flex-wrap:wrap;gap:6px;align-items:center;border:2px solid var(--line)}
+.codebox{background:#f6f4ff;border:2px solid #ddd6fb;border-radius:16px;padding:14px 16px;font-family:"Courier New",monospace;font-size:17px;white-space:pre-wrap;color:#2c2f6b;line-height:1.55}
+.codebox .k{color:#c2410c;font-weight:700}.codebox .s{color:#0f766e}.codebox .c{color:#7c7fa8}
+.res-table{width:100%;border-collapse:collapse;margin-top:10px}
+.res-table td,.res-table th{padding:8px 10px;border-bottom:1px solid var(--line);text-align:left}
+.res-table th{font-size:15px;color:var(--muted)}
+.discuss{display:grid;gap:14px}
+.dq{font-size:22px;font-weight:700}
+.ans{background:var(--soft);border-radius:12px;padding:10px 14px;margin-top:10px}
+.mission{background:linear-gradient(135deg,#fff8e1,#efeaff);border:2px solid #e9dcff}
+.mission li{margin:6px 0}
+.mission input{transform:scale(1.4);margin-right:10px}
+.toast{position:fixed;left:50%;bottom:26px;transform:translateX(-50%) translateY(120px);background:var(--ink);color:#fff;padding:14px 22px;border-radius:16px;font-weight:700;z-index:99;transition:transform .35s;max-width:90vw;text-align:center}
+.toast.on{transform:translateX(-50%) translateY(0)}
+.conf{position:fixed;top:-50px;font-size:30px;pointer-events:none;z-index:98;animation:fall 1.8s linear forwards}
+@keyframes fall{to{transform:translateY(112vh) rotate(380deg)}}
+.pill{display:inline-block;background:var(--soft);border:1px solid var(--line);border-radius:999px;padding:3px 12px;font-size:15px;margin:2px}
+.center{text-align:center}
+@media(max-width:640px){body{font-size:17px}.sec-title{font-size:26px}.scene{font-size:52px}.story-text{font-size:20px}.menu-h{font-size:28px}}
+</style></head><body>
+<header class="top"><div class="brand">Young IT Germany</div><div class="lvl">Level 1 · AI Explorer</div><button class="homebtn" data-go="menu">🏠 Menu</button></header>
+<main>
+<section class="page show" id="title"><div class="title-card"><div class="chap">How AI Learns from What It Senses</div><div class="luna big-luna"></div><h1>How AI Recognizes Sounds and Movement</h1><button class="btn big moon" data-go="menu">Enter Activities ✨</button></div></section>
+<section class="page" id="menu"><h2 class="menu-h">How AI Recognizes Sounds and Movement</h2><p class="menu-sub">Follow the moon path from 1 to 8 — or tap any part to jump in!</p><div id="menuGrid"></div></section>
+<section class="page" data-sec="hook" data-group="Learn" data-title="Hook / Story" data-min="5" data-icon="📖">
+<div class="card"><div class="slides">
+ <div class="slide"><div class="scene">🌙 🤖 🔇</div><p class="story-text">Up on the Moon it is very, very quiet. Luna the Moon Robot had never heard a single sound!</p></div>
+ <div class="slide"><div class="scene">🏠 👏 💡</div><p class="story-text">Then Luna visited Earth. In one house, a boy clapped twice — <b>👏👏</b> — and the lights turned ON by themselves!</p></div>
+ <div class="slide"><div class="scene">🔊 🗣️ 🎵</div><p class="story-text">A girl said, <b>"Hey speaker, play a song!"</b> — and music started. The speaker understood her voice!</p></div>
+ <div class="slide"><div class="scene">🕺 📺 🎮</div><p class="story-text">In a game, a boy jumped and waved his arms… and the character on the screen copied every move!</p></div>
+ <div class="slide"><div class="scene">🤔 👂 👀</div><p class="story-text big-q">Computers have no ears and no eyes. So how can they hear a clap or see you wave?</p></div>
+</div><div class="row"><button class="btn ghost sm" data-say=".slide.on">🔊 Read to me</button></div></div>
+<div class="tip teacher">👩‍🏫 <b>Teacher tip:</b> Ask the class to clap twice together, then ask: "What makes a clap different from talking?" (short, loud, sharp!)</div>
+</section>
+
+<section class="page" data-sec="concept" data-group="Learn" data-title="Simple Concept" data-min="10" data-icon="💡">
+<div class="badges"><span class="badge">🇪🇺 AI Literacy</span></div>
+<div class="card"><h3>🎤 AI's ears and 📷 AI's eyes</h3>
+<div class="pipeline"><div class="pstep"><div class="big">🎤📷</div><b>1. Sense</b><span>A microphone or camera collects sound or pictures</span></div><div class="parrow">➜</div><div class="pstep"><div class="big">〰️🎞️</div><b>2. Turn into numbers</b><span>Sound becomes waves, video becomes frames</span></div><div class="parrow">➜</div><div class="pstep"><div class="big">🔍</div><b>3. Find patterns</b><span>A clap is short and loud. A wave goes left-right-left.</span></div></div></div>
+<div class="grid2">
+ <div class="card"><h3>〰️ Sounds are waves</h3><p>Tap a button to hear the sound and see its wave.</p>
+ <canvas id="waveC" width="460" height="150" style="width:100%;background:#f6f4ff;border-radius:16px;border:2px solid #ddd6fb"></canvas>
+ <div class="row"><button class="btn sm" data-w="high">🐦 High</button><button class="btn sm teal" data-w="low">🐻 Low</button><button class="btn sm coral" data-w="loud">📢 Loud</button><button class="btn sm lilac" data-w="soft">🤫 Soft</button></div>
+ <p id="waveTxt" class="muted" style="margin-top:10px">High sounds have squiggly, close waves. Loud sounds have tall waves.</p></div>
+ <div class="card"><h3>🎞️ Movement is frames</h3><p>A video is many pictures shown very fast. AI looks at <b>what changes</b> from one picture to the next.</p>
+ <div class="center" style="font-size:20px"><div id="flipbook" style="font-size:96px;line-height:1.2">🧍</div><div id="frames" class="row" style="justify-content:center"></div></div>
+ <div class="row" style="justify-content:center"><button class="btn moon" id="playFB">▶ Play frames</button></div>
+ <p id="fbTxt" class="muted center"></p></div>
+</div>
+<h3 style="margin:8px 0 12px">🃏 Magic word cards — tap to flip!</h3>
+<div class="grid3">
+ <div class="flip"><div class="in"><div class="f"><div class="big">🎤</div><b>Microphone</b><small>Tap to flip 👆</small></div><div class="b">The AI's "ears". It turns sound into numbers the computer can read.</div></div></div>
+ <div class="flip"><div class="in"><div class="f"><div class="big">〰️</div><b>Sound Wave</b><small>Tap to flip 👆</small></div><div class="b">The shape of a sound. Tall = loud, squiggly = high.</div></div></div>
+ <div class="flip"><div class="in"><div class="f"><div class="big">🎞️</div><b>Frame</b><small>Tap to flip 👆</small></div><div class="b">One single picture from a video. Videos have 30 frames every second!</div></div></div>
+ <div class="flip"><div class="in"><div class="f"><div class="big">👋</div><b>Gesture</b><small>Tap to flip 👆</small></div><div class="b">A movement that means something, like waving hello or thumbs-up.</div></div></div>
+</div>
+</section>
+
+<section class="page" data-sec="demo" data-group="Learn" data-title="Live AI Demo" data-min="10" data-icon="🔮">
+<div class="badges"><span class="badge b2">🇪🇺 GDPR · Ask before using mic &amp; camera</span></div>
+<div class="grid2">
+ <div class="card"><h3>👂 Luna listens</h3><p>Turn on the microphone and make sounds: clap, whistle, hum!</p>
+ <canvas id="micC" width="460" height="150" style="width:100%;background:#f6f4ff;border-radius:16px;border:2px solid #ddd6fb"></canvas>
+ <p style="margin:10px 0 4px"><b>Loudness</b></p><div class="meter"><i id="volBar"></i></div>
+ <div class="grid2" style="gap:10px;margin-top:12px"><div class="card center" style="margin:0;padding:12px"><div style="font-size:15px" class="muted">Claps heard</div><div id="claps" style="font-size:40px;font-weight:700">👏 0</div></div><div class="card center" style="margin:0;padding:12px"><div style="font-size:15px" class="muted">Sound type</div><div id="pitch" style="font-size:26px;font-weight:700">—</div></div></div>
+ <div class="row"><button class="btn teal" id="micOn">🎤 Start microphone</button><button class="btn ghost" id="micOff">⏹ Stop</button></div><p id="micMsg" class="muted"></p></div>
+ <div class="card"><h3>👀 Luna watches</h3><p>Turn on the camera and wave your hand. The purple dots show <b>what changed</b> — that is how AI "sees" movement!</p>
+ <div class="grid2" style="gap:10px"><video id="vid" autoplay playsinline muted style="width:100%;border-radius:14px;background:#eceffa;transform:scaleX(-1)"></video><canvas id="diffC" width="160" height="120" style="width:100%;border-radius:14px;background:#f6f4ff;transform:scaleX(-1)"></canvas></div>
+ <p style="margin:10px 0 4px"><b>Movement</b></p><div class="meter"><i id="motBar"></i></div>
+ <div id="motTxt" class="center" style="font-size:26px;font-weight:700;margin-top:10px">—</div>
+ <div class="row"><button class="btn teal" id="camOn">📷 Start camera</button><button class="btn ghost" id="camOff">⏹ Stop</button></div><p id="camMsg" class="muted"></p></div>
+</div>
+<div class="tip teacher">👩‍🏫 <b>On Google Meet:</b> share this browser tab with "Also share tab audio" off. If the camera is busy in Meet, use the microphone demo first. Remind students: an app should always <b>ask</b> before using your microphone or camera — and you can say no!</div>
+</section>
+
+<section class="page" data-sec="activity" data-group="Do" data-title="Student Activity" data-min="15" data-icon="🧩">
+<div class="card"><h3>🔊 Part 1: Sound Detective</h3><p>Play each sound. What made it? Choose the picture!</p><div id="sounds" class="grid2"></div>
+<div class="row"><button class="btn teal" id="sndChk">Check my answers ✔</button></div><p class="fb" id="sndFb"></p></div>
+<div class="card"><h3>🎞️ Part 2: Movement Detective</h3><p>Look at the pictures from left to right. What is the person doing?</p><div id="moveQ"></div></div>
+</section>
+
+<section class="page" data-sec="build" data-group="Do" data-title="Build / Coding Exercise" data-min="20" data-icon="🧱">
+<div class="card"><h3>🎮 Make Luna Move!</h3><p>Choose what Luna does when she hears a <b>clap</b> and when she sees a <b>wave</b>. Then press ▶ Run!</p><div id="gRules"></div></div>
+<div class="grid2">
+ <div class="card"><h3>👀 Your code</h3><div class="codebox" id="gCode"></div></div>
+ <div class="card center"><h3>🎬 Game stage</h3>
+ <div id="stage" style="position:relative;height:230px;border-radius:18px;background:linear-gradient(#eef0ff,#fff);border:2px solid #d9def3;overflow:hidden">
+  <div id="event" style="position:absolute;top:10px;left:12px;font-size:22px;font-weight:700"></div>
+  <div id="fx" style="position:absolute;top:30px;right:20px;font-size:44px"></div>
+  <div class="luna" id="gLuna" style="width:110px;position:absolute;left:50%;bottom:10px;margin-left:-55px"></div></div>
+ <div class="row" style="justify-content:center"><button class="btn teal" id="gRun">▶ Run the game</button></div><p class="fb" id="gFb"></p></div>
+</div>
+<div class="tip">💡 <b>Mission:</b> Give the clap and the wave <b>different</b> actions!</div>
+</section>
+
+<section class="page" data-sec="challenge" data-group="Do" data-title="Challenge" data-min="15" data-icon="🏆">
+<div class="card"><h3>🦘 Put the Jump in Order</h3><p>Tap the 3 pictures in the right order: first ➜ middle ➜ last.</p>
+<div id="frPool" class="row"></div><p style="margin:14px 0 4px"><b>Your order:</b></p><div id="frSeq" class="row" style="min-height:150px;background:#f3f5fe;border-radius:16px;padding:10px;border:2px dashed #d9def3"></div>
+<div class="row"><button class="btn teal" id="frChk">Check ✔</button><button class="btn moon" id="frPlay">▶ Play my animation</button><button class="btn ghost" id="frRst">Start again ↺</button></div><p class="fb" id="frFb"></p></div>
+<div class="card"><h3>🌟 Super Challenge: Secret Clap Code</h3><p>Play the code. How many claps do you hear?</p><div id="clapQ"></div></div>
+</section>
+
+<section class="page" data-sec="discuss" data-group="Wrap" data-title="Discussion" data-min="5" data-icon="💬">
+<div class="discuss">
+ <div class="card"><div class="dq">🔊 Should a smart speaker listen to us all the time?</div><button class="btn ghost sm" data-reveal>💡 Show an idea</button><div class="ans" hidden>It should only listen when you say its wake word. We can switch off the microphone when we want privacy.</div></div>
+ <div class="card"><div class="badges"><span class="badge b2">🇪🇺 GDPR · Your data</span></div><div class="dq">📷 Who should be allowed to see videos from a camera in your home?</div><button class="btn ghost sm" data-reveal>💡 Show an idea</button><div class="ans" hidden>Only your family — and only with permission. Videos of you are your personal data.</div></div>
+ <div class="card"><div class="dq">⌚ Where have you seen sound or movement AI?</div><button class="btn ghost sm" data-reveal>💡 Show an idea</button><div class="ans" hidden>Voice assistants, dance and sports games, smart watches that count steps, cars that beep when parking.</div></div>
+</div>
+</section>
+
+<section class="page" data-sec="quiz" data-group="Wrap" data-title="Quiz &amp; Take-home Mission" data-min="10" data-icon="🎯">
+<div id="quiz"></div>
+<div class="card mission"><h3>🚀 Take-home Mission: Sound &amp; Move Diary</h3><ul style="list-style:none;padding:0">
+<li><label><input type="checkbox">Listen for 5 sounds at home. Write if each is <b>high or low</b>, <b>loud or soft</b></label></li>
+<li><label><input type="checkbox">Make up your own <b>secret clap code</b> and teach it to a family member</label></li>
+<li><label><input type="checkbox">Draw 4 frames of someone waving, like a flipbook</label></li>
+<li><label><input type="checkbox">Find one device at home that uses a microphone or camera</label></li></ul></div>
+</section>
+
+</main><script>const $=(s,r=document)=>r.querySelector(s),$$=(s,r=document)=>[...r.querySelectorAll(s)];
+const LUNA=`<svg viewBox="0 0 120 140" xmlns="http://www.w3.org/2000/svg"><line x1="60" y1="10" x2="60" y2="24" stroke="#4a52c9" stroke-width="4" stroke-linecap="round"/><path d="M60 1 l3.2 6.4 7 1-5 5 1.2 7-6.4-3.4-6.4 3.4 1.2-7-5-5 7-1z" fill="#f3c44f"/><circle cx="60" cy="52" r="30" fill="#fff4c9" stroke="#f3c44f" stroke-width="4"/><circle cx="75" cy="40" r="5" fill="#f6dd8a"/><circle cx="44" cy="66" r="4" fill="#f6dd8a"/><circle cx="49" cy="50" r="5.5" fill="#1c2250"/><circle cx="71" cy="50" r="5.5" fill="#1c2250"/><circle cx="51" cy="48" r="1.8" fill="#fff"/><circle cx="73" cy="48" r="1.8" fill="#fff"/><path d="M50 62 q10 8 20 0" stroke="#1c2250" stroke-width="3" fill="none" stroke-linecap="round"/><circle cx="39" cy="60" r="4" fill="#f9b4a8"/><circle cx="81" cy="60" r="4" fill="#f9b4a8"/><rect x="32" y="84" width="56" height="42" rx="14" fill="#8a68dc"/><rect x="44" y="93" width="32" height="20" rx="6" fill="#eef2fc"/><circle cx="52" cy="103" r="3" fill="#1fa79c"/><circle cx="60" cy="103" r="3" fill="#f3c44f"/><circle cx="68" cy="103" r="3" fill="#e9604f"/><rect x="18" y="89" width="12" height="26" rx="6" fill="#4a52c9"/><rect x="90" y="89" width="12" height="26" rx="6" fill="#4a52c9"/><rect x="40" y="124" width="12" height="13" rx="4" fill="#4a52c9"/><rect x="68" y="124" width="12" height="13" rx="4" fill="#4a52c9"/></svg>`;
+const App={onShow:{},shown:new Set(),done:new Set()};
+const GROUPS=[['Learn','🌙 Learn'],['Do','🚀 Do &amp; Build'],['Wrap','⭐ Wrap Up']];
+function shuffle(a){a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
+function setup(){
+  $$('.luna').forEach(e=>e.innerHTML=LUNA);
+  const secs=$$('section.page[data-sec]');
+  secs.forEach(s=>s.id='s-'+s.dataset.sec);
+  const grid=$('#menuGrid');
+  GROUPS.forEach(([g,label])=>{
+    const list=secs.filter(s=>s.dataset.group===g); if(!list.length)return;
+    grid.insertAdjacentHTML('beforeend',`<div class="grp-h">${label}</div><div class="mgrid" id="mg-${g}"></div>`);
+    list.forEach(s=>{const i=secs.indexOf(s);
+      $('#mg-'+g).insertAdjacentHTML('beforeend',`<button class="mcard g-${g}" data-go="${s.id}"><span class="mnum">${i+1}</span><span class="mic">${s.dataset.icon}</span><span class="mt">${s.dataset.title}</span><span class="mm">⏱ ${s.dataset.min} min</span></button>`)});
+  });
+  secs.forEach((s,i)=>{
+    s.insertAdjacentHTML('afterbegin',`<div class="sec-head"><div class="sec-ic">${s.dataset.icon}</div><div><div class="sec-kick">Part ${i+1} of ${secs.length} · ${s.dataset.min} minutes</div><h2 class="sec-title">${s.dataset.title}</h2></div></div>`);
+    const nx=secs[i+1];
+    s.insertAdjacentHTML('beforeend',`<div class="sec-nav"><button class="btn ghost" data-go="menu">← Back to Menu</button>${nx?`<button class="btn" data-go="${nx.id}">Next: ${nx.dataset.title} →</button>`:`<button class="btn moon" data-go="menu">Finish 🌙</button>`}</div>`);
+  });
+  document.addEventListener('click',e=>{
+    const g=e.target.closest('[data-go]'); if(g){go(g.dataset.go);return}
+    const f=e.target.closest('.flip'); if(f){f.classList.toggle('on');return}
+    const r=e.target.closest('[data-reveal]'); if(r){const t=r.nextElementSibling;t.hidden=!t.hidden;r.textContent=t.hidden?'💡 Show an idea':'🙈 Hide idea';return}
+    const sy=e.target.closest('[data-say]'); if(sy){const t=sy.dataset.say?$('.page.show '+sy.dataset.say):sy.closest('.card');if(t)say(t.innerText)}
+  });
+  $$('.slides').forEach(initSlides);
+}
+function go(id){
+  $$('.page').forEach(p=>p.classList.remove('show'));
+  const p=document.getElementById(id); if(!p)return; p.classList.add('show'); window.scrollTo({top:0});
+  if('speechSynthesis' in window)speechSynthesis.cancel();
+  if(!App.shown.has(id)){App.shown.add(id);const sec=p.dataset.sec;if(sec&&App.onShow[sec])App.onShow[sec]()}
+}
+function say(t){if(!('speechSynthesis' in window))return;speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(t);u.rate=.9;u.lang='en-US';speechSynthesis.speak(u)}
+function initSlides(el){
+  const sl=$$('.slide',el);let i=0;
+  el.insertAdjacentHTML('beforeend',`<div class="sl-ctrl"><button class="btn ghost prev">◀ Back</button><div class="dots">${sl.map(()=>'<i></i>').join('')}</div><button class="btn next">Next ▶</button></div>`);
+  const dots=$$('.dots i',el),pv=$('.prev',el),nx=$('.next',el);
+  const up=()=>{sl.forEach((s,k)=>s.classList.toggle('on',k===i));dots.forEach((d,k)=>d.classList.toggle('on',k===i));pv.disabled=i===0;nx.disabled=i===sl.length-1};
+  pv.onclick=()=>{if(i>0){i--;up()}};nx.onclick=()=>{if(i<sl.length-1){i++;up()}};up();
+}
+let toastT;
+function toast(m){let t=$('.toast');if(!t){t=document.createElement('div');t.className='toast';document.body.appendChild(t)}t.textContent=m;t.classList.add('on');clearTimeout(toastT);toastT=setTimeout(()=>t.classList.remove('on'),2600)}
+function confetti(){const em=['⭐','🌙','✨','💫','🌟'];for(let k=0;k<26;k++){const s=document.createElement('span');s.className='conf';s.textContent=em[k%em.length];s.style.left=Math.random()*100+'vw';s.style.animationDelay=Math.random()*.5+'s';s.style.fontSize=(20+Math.random()*20)+'px';document.body.appendChild(s);setTimeout(()=>s.remove(),2600)}}
+function award(sec,msg){App.done.add(sec);const c=$(`.mcard[data-go="s-${sec}"]`);if(c)c.classList.add('done');confetti();toast(msg||'Amazing work! ⭐')}
+function quiz(el,qs,onDone){
+  let score=0,ans=0;
+  el.innerHTML=qs.map((q,i)=>`<div class="qcard"><span class="qn">Question ${i+1}</span><p class="qq">${q.q}</p><div class="opts">${q.o.map((o,j)=>`<button class="opt" data-i="${i}" data-j="${j}">${o}</button>`).join('')}</div><p class="why"></p></div>`).join('')+`<div class="score-box" hidden></div>`;
+  el.addEventListener('click',e=>{const b=e.target.closest('.opt');if(!b)return;const c=b.closest('.qcard');if(c.dataset.done)return;c.dataset.done=1;
+    const q=qs[b.dataset.i],ok=+b.dataset.j===q.a;b.classList.add(ok?'right':'wrong');if(!ok)$$('.opt',c)[q.a].classList.add('right');
+    $('.why',c).innerHTML=(ok?'✅ Correct! ':'💡 ')+q.why;if(ok)score++;ans++;
+    if(ans===qs.length){const sb=$('.score-box',el);sb.hidden=false;const st=Math.round(score/qs.length*5);sb.innerHTML=`You got ${score} out of ${qs.length}! <br>${'⭐'.repeat(st)}${'☆'.repeat(5-st)}<br><span style="font-size:18px;font-weight:400">${score===qs.length?'Perfect! You are a true AI Explorer!':'Great try! Scroll up to read the explanations.'}</span>`;onDone&&onDone(score)}});
+}
+function sorter(el,items,cats,onWin){
+  const build=()=>{
+    el.innerHTML=`<p class="muted">👆 Tap a picture, then tap the box where it belongs.</p><div class="tray">${shuffle(items.map((it,i)=>({...it,i}))).map(it=>`<button class="chip" data-i="${it.i}"><span class="big">${it.e}</span><small>${it.n}</small></button>`).join('')}</div><div class="buckets">${cats.map(c=>`<div class="bucket" data-c="${c.id}"><div class="bh">${c.icon} ${c.name}</div><div class="bin"></div></div>`).join('')}</div><div class="row"><button class="btn teal chk">Check my sorting ✔</button><button class="btn ghost rst">Start again ↺</button></div><p class="fb"></p>`;
+    let sel=null;
+    el.onclick=e=>{
+      const ch=e.target.closest('.chip');
+      if(ch){$$('.chip',el).forEach(c=>c.classList.remove('sel'));if(sel===ch){sel=null;return}sel=ch;ch.classList.add('sel');ch.classList.remove('ok','bad');return}
+      const bk=e.target.closest('.bucket');
+      if(bk&&sel){$('.bin',bk).appendChild(sel);sel.classList.remove('sel');sel=null;return}
+      if(e.target.closest('.rst')){build();return}
+      if(e.target.closest('.chk')){
+        const fb=$('.fb',el);
+        if($$('.tray .chip',el).length){fb.className='fb oops';fb.textContent='Sort every picture first! 🙂';return}
+        let right=0;$$('.bucket',el).forEach(b=>$$('.chip',b).forEach(c=>{const ok=items[c.dataset.i].cat===b.dataset.c;c.classList.add(ok?'ok':'bad');if(ok)right++}));
+        if(right===items.length){fb.className='fb good';fb.textContent=`All ${right} correct! You made perfect training data! 🎉`;onWin&&onWin()}
+        else{fb.className='fb oops';fb.textContent=`${right} of ${items.length} correct. Move the red ones to the right box and check again!`}
+      }
+    };
+  };build();
+}
+window.addEventListener('DOMContentLoaded',setup);
+</script><script>let _ac;const AC=()=>{if(!_ac)_ac=new (window.AudioContext||window.webkitAudioContext)();if(_ac.state==='suspended')_ac.resume();return _ac};
+function tone(f,d,type='sine',v=.25,t0=0,f2){const a=AC(),t=a.currentTime+t0,o=a.createOscillator(),g=a.createGain();o.type=type;o.frequency.setValueAtTime(f,t);if(f2)o.frequency.linearRampToValueAtTime(f2,t+d);
+  g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(v,t+.02);g.gain.setValueAtTime(v,t+Math.max(.03,d-.06));g.gain.linearRampToValueAtTime(0,t+d);o.connect(g).connect(a.destination);o.start(t);o.stop(t+d+.02)}
+function clap(t0=0){const a=AC(),t=a.currentTime+t0,n=a.sampleRate*.12,b=a.createBuffer(1,n,a.sampleRate),d=b.getChannelData(0);for(let i=0;i<n;i++)d[i]=(Math.random()*2-1)*Math.exp(-i/(n*.12));
+  const s=a.createBufferSource(),f=a.createBiquadFilter(),g=a.createGain();s.buffer=b;f.type='bandpass';f.frequency.value=1400;g.gain.value=.9;s.connect(f).connect(g).connect(a.destination);s.start(t)}
+function playClaps(ts){ts.forEach(t=>clap(t))}
+const SOUNDS={
+  bird:()=>{[0,.16,.32,.7,.86].forEach(t=>tone(2600,.09,'sine',.18,t,3600))},
+  cow:()=>{tone(150,1.3,'sawtooth',.16,0,105)},
+  clap:()=>playClaps([0,.35,.7,1.05]),
+  siren:()=>{for(let k=0;k<4;k++){tone(720,.38,'triangle',.22,k*.76);tone(960,.38,'triangle',.22,k*.76+.38)}},
+  bell:()=>{tone(660,.6,'sine',.3,0);tone(523,1,'sine',.3,.6)},
+  heart:()=>{[0,.22,.9,1.12,1.8,2.02].forEach(t=>{tone(95,.13,'sine',.6,t);tone(190,.1,'sine',.25,t)})}
+};
+
+App.onShow.concept=()=>{
+  const c=$('#waveC'),x=c.getContext('2d');
+  const draw=(A,n,col)=>{x.clearRect(0,0,c.width,c.height);x.strokeStyle='#d9def3';x.lineWidth=1;x.beginPath();x.moveTo(0,75);x.lineTo(c.width,75);x.stroke();
+    x.strokeStyle=col;x.lineWidth=4;x.beginPath();for(let i=0;i<=c.width;i++){const y=75-A*65*Math.sin(i/c.width*n*Math.PI*2);i?x.lineTo(i,y):x.moveTo(i,y)}x.stroke()};
+  draw(.5,5,'#4a52c9');
+  const W={high:[.6,16,'#4a52c9',()=>tone(1200,.8,'sine',.2),'HIGH sound: waves are squiggly and close together — like a bird 🐦'],
+    low:[.6,3,'#1fa79c',()=>tone(140,.9,'sine',.45),'LOW sound: waves are wide and slow — like a bear growling 🐻'],
+    loud:[.95,6,'#e9604f',()=>tone(440,.8,'sine',.45),'LOUD sound: waves are TALL ⬆️'],
+    soft:[.18,6,'#8a68dc',()=>tone(440,.8,'sine',.05),'SOFT sound: waves are short and small 🤫']};
+  $$('[data-w]').forEach(b=>b.onclick=()=>{const w=W[b.dataset.w];draw(w[0],w[1],w[2]);w[3]();$('#waveTxt').textContent=w[4]});
+  const F=['🧍','🙋','🧍','🙋'];$('#frames').innerHTML=F.map((f,i)=>`<span class="pill" data-f="${i}">Frame ${i+1}: ${f}</span>`).join('');
+  $('#playFB').onclick=()=>{let k=0;$('#fbTxt').textContent='';const iv=setInterval(()=>{const i=k%4;$('#flipbook').textContent=F[i];
+    $$('#frames .pill').forEach((p,j)=>p.style.background=j===i?'#fbe6a4':'');k++;if(k>=12){clearInterval(iv);$('#fbTxt').innerHTML='Arm goes <b>up, down, up, down</b>… The AI spots this change and says: <b>"Waving! 👋"</b>'}},350)};
+};
+
+App.onShow.demo=()=>{
+  let mic=null,raf=0,claps=0,lastClap=0,prevPeak=0;
+  const c=$('#micC'),x=c.getContext('2d');
+  $('#micOn').onclick=async()=>{if(mic)return;try{const st=await navigator.mediaDevices.getUserMedia({audio:true});const a=AC(),src=a.createMediaStreamSource(st),an=a.createAnalyser();an.fftSize=2048;src.connect(an);mic={st,an};$('#micMsg').textContent='Listening… try clapping! 👏';
+    const td=new Float32Array(an.fftSize),fd=new Float32Array(an.frequencyBinCount);
+    const loop=()=>{an.getFloatTimeDomainData(td);let peak=0,sum=0;for(const v of td){peak=Math.max(peak,Math.abs(v));sum+=v*v}const rms=Math.sqrt(sum/td.length);
+      x.clearRect(0,0,c.width,c.height);x.strokeStyle='#4a52c9';x.lineWidth=3;x.beginPath();for(let i=0;i<c.width;i++){const v=td[Math.floor(i/c.width*td.length)];const y=75-v*70*2;i?x.lineTo(i,y):x.moveTo(i,y)}x.stroke();
+      $('#volBar').style.width=Math.min(100,rms*500)+'%';
+      const now=performance.now();if(peak>.55&&prevPeak<.3&&now-lastClap>280){claps++;lastClap=now;$('#claps').textContent='👏 '+claps}prevPeak=peak;
+      if(rms>.03){an.getFloatFrequencyData(fd);let bi=0,bv=-1e9;const hz=a.sampleRate/an.fftSize;for(let i=Math.floor(80/hz);i<Math.floor(4000/hz);i++)if(fd[i]>bv){bv=fd[i];bi=i}
+        const f=Math.round(bi*hz);$('#pitch').textContent=f>650?`🐦 High (${f} Hz)`:f<300?`🐻 Low (${f} Hz)`:`🙂 Middle (${f} Hz)`}else $('#pitch').textContent='🤫 Quiet';
+      raf=requestAnimationFrame(loop)};loop()}catch(e){$('#micMsg').textContent='The microphone is not allowed or not found. Check the browser permission (🔒 next to the address).'}};
+  $('#micOff').onclick=()=>{if(!mic)return;cancelAnimationFrame(raf);mic.st.getTracks().forEach(t=>t.stop());mic=null;$('#micMsg').textContent='Microphone stopped.'};
+  let cam=null,craf=0,prev=null;const v=$('#vid'),dc=$('#diffC'),dx=dc.getContext('2d'),pc=document.createElement('canvas');pc.width=80;pc.height=60;const px=pc.getContext('2d',{willReadFrequently:true});
+  $('#camOn').onclick=async()=>{if(cam)return;try{const st=await navigator.mediaDevices.getUserMedia({video:{width:320,height:240}});v.srcObject=st;cam=st;$('#camMsg').textContent='Watching… wave your hand! 👋';
+    const loop=()=>{if(v.readyState>=2){px.drawImage(v,0,0,80,60);const d=px.getImageData(0,0,80,60).data,g=new Float32Array(4800);for(let i=0;i<4800;i++)g[i]=(d[i*4]+d[i*4+1]+d[i*4+2])/3;
+      if(prev){let cnt=0,L=0,R=0;dx.fillStyle='#f6f4ff';dx.fillRect(0,0,160,120);dx.fillStyle='#8a68dc';
+        for(let i=0;i<4800;i++)if(Math.abs(g[i]-prev[i])>28){cnt++;const xx=i%80;if(xx<40)L++;else R++;dx.fillRect(xx*2,Math.floor(i/80)*2,2,2)}
+        const m=Math.min(100,cnt/4800*300);$('#motBar').style.width=m+'%';const side=R>L?'⬅️ left side':'right side ➡️';
+        $('#motTxt').textContent=m<4?'😴 Still':m<18?'🙂 Small movement':`👋 Big movement on the ${side}!`}prev=g}craf=requestAnimationFrame(loop)};loop()}
+    catch(e){$('#camMsg').textContent='The camera is not allowed, not found, or busy in another app (like Meet).'}};
+  $('#camOff').onclick=()=>{if(!cam)return;cancelAnimationFrame(craf);cam.getTracks().forEach(t=>t.stop());cam=null;prev=null;$('#camMsg').textContent='Camera stopped.'};
+};
+
+App.onShow.activity=()=>{
+  const S=[{k:'bird',a:'🐦 Bird',clue:'High and quick chirps = bird.'},{k:'cow',a:'🐄 Cow',clue:'Low and long = cow mooing.'},{k:'clap',a:'👏 Clapping',clue:'Short, loud, sharp bursts = claps.'},
+    {k:'siren',a:'🚑 Siren',clue:'Two notes going up-down-up-down = siren.'},{k:'bell',a:'🔔 Doorbell',clue:'Two clear notes "ding-dong" = doorbell.'},{k:'heart',a:'❤️ Heartbeat',clue:'Low thumps in pairs "lub-dub" = heartbeat.'}];
+  const order=shuffle(S),opts=shuffle(S.map(s=>s.a));
+  $('#sounds').innerHTML=order.map((s,i)=>`<div class="card center" style="margin:0"><div style="font-size:44px">🎧</div><b>Sound ${i+1}</b><div class="row" style="justify-content:center"><button class="btn sm" data-p="${s.k}">▶ Play</button></div><select data-i="${i}" style="font:inherit;margin-top:10px;padding:8px;border-radius:10px;border:2px solid #d9def3;width:100%"><option value="">Choose…</option>${opts.map(o=>`<option>${o}</option>`).join('')}</select><p class="clue muted" style="font-size:16px"></p></div>`).join('');
+  $('#sounds').onclick=e=>{const b=e.target.closest('[data-p]');if(b)SOUNDS[b.dataset.p]()};
+  $('#sndChk').onclick=()=>{let r=0,emp=0;$$('#sounds select').forEach(s=>{const it=order[s.dataset.i],card=s.closest('.card');if(!s.value){emp++;return}const ok=s.value===it.a;if(ok)r++;
+      card.style.borderColor=ok?'#1fa79c':'#e9604f';$('.clue',card).textContent=ok?'✅ '+it.clue:'❌ Listen again! Hint: '+it.clue.split('=')[0]});
+    const fb=$('#sndFb');if(emp){fb.className='fb oops';fb.textContent='Choose an answer for every sound first!';return}
+    if(r===6){fb.className='fb good';fb.textContent='6 / 6! You found the pattern in every sound — just like an AI! 🎉';award('activity','Sound Detective! 🔊')}else{fb.className='fb oops';fb.textContent=`${r} / 6 correct. Play the red ones again and listen for the pattern.`}};
+  quiz($('#moveQ'),[
+    {q:'<span style="font-size:44px">🧍 → 🙋 → 🧍 → 🙋</span>',o:['Waving 👋','Sleeping 😴','Swimming 🏊','Sitting 🪑'],a:0,why:'The arm goes up and down again and again — waving!'},
+    {q:'<span style="font-size:44px">🧍 → 🙇 → 🧍 → 🙇</span>',o:['Jumping','Bowing','Running','Clapping'],a:1,why:'The body bends forward and comes back up — bowing.'},
+    {q:'<span style="font-size:44px">🧍 → 🚶 → 🏃 → 🏃</span>',o:['Stopping','Starting to run','Falling asleep','Dancing'],a:1,why:'Standing, then walking, then running — speeding up!'},
+    {q:'<span style="font-size:44px">🧍 → 🙆 → 🧍 → 🙆</span>',o:['Jumping jacks','Reading','Eating','Waving with one hand'],a:0,why:'Both arms go up over the head and down again — jumping jacks!'}
+  ]);
+};
+
+App.onShow.build=()=>{
+  const IN=[['clap','👏 hears a clap','hear'],['whistle','🎵 hears a whistle','hear'],['wave','👋 sees a wave','see'],['jump','🦘 sees a jump','see']];
+  const ACT={jump:'jumps up ⬆️',spin:'spins around 🌀',lights:'turns on the lights 💡',music:'plays music 🎶',waveback:'waves back 👋',dance:'dances 💃'};
+  const opts=Object.entries(ACT).map(([k,v])=>`<option value="${k}">Luna ${v}</option>`).join('');
+  $('#gRules').innerHTML=IN.map(([k,l])=>`<div class="rule"><span class="blk when">WHEN AI ${l}</span><span class="blk do">DO <select data-k="${k}">${opts}</select></span></div>`).join('');
+  const rules=()=>Object.fromEntries($$('#gRules select').map(s=>[s.dataset.k,s.value]));
+  const code=()=>{const r=rules();$('#gCode').innerHTML=IN.map(([k,,t])=>`<span class="k">when</span> ${t}(<span class="s">"${k}"</span>):\n    luna.${r[k]}()`).join('\n')};code();$('#gRules').onchange=code;
+  const L=$('#gLuna'),stage=$('#stage'),fx=$('#fx');
+  const DO={jump:()=>L.animate([{transform:'translateY(0)'},{transform:'translateY(-80px)'},{transform:'translateY(0)'}],{duration:700}),
+    spin:()=>L.animate([{transform:'rotate(0)'},{transform:'rotate(360deg)'}],{duration:800}),
+    lights:()=>stage.animate([{background:'#eef0ff'},{background:'#fff3b0'},{background:'#fff3b0'},{background:'#eef0ff'}],{duration:1100}),
+    music:()=>{fx.textContent='🎶';fx.animate([{opacity:0,transform:'translateY(20px)'},{opacity:1,transform:'translateY(-20px)'},{opacity:0}],{duration:1100});[523,659,784].forEach((f,i)=>tone(f,.2,'triangle',.15,i*.2))},
+    waveback:()=>{fx.textContent='👋';fx.animate([{opacity:0,transform:'rotate(-20deg)'},{opacity:1,transform:'rotate(20deg)'},{opacity:1,transform:'rotate(-20deg)'},{opacity:0}],{duration:1100})},
+    dance:()=>L.animate([{transform:'rotate(0)'},{transform:'rotate(-15deg)'},{transform:'rotate(15deg)'},{transform:'rotate(-15deg)'},{transform:'rotate(0)'}],{duration:900})};
+  const SND={clap:()=>playClaps([0]),whistle:()=>tone(1500,.4,'sine',.15,0,1900)};
+  $('#gRun').onclick=()=>{const r=rules(),seq=shuffle([...IN.map(i=>i[0]),IN[Math.floor(Math.random()*4)][0],IN[Math.floor(Math.random()*4)][0]]);$('#gRun').disabled=true;$('#gFb').textContent='';
+    seq.forEach((k,i)=>setTimeout(()=>{const inp=IN.find(x=>x[0]===k);$('#event').textContent='AI '+inp[1];SND[k]&&SND[k]();DO[r[k]]();
+      if(i===seq.length-1)setTimeout(()=>{$('#gRun').disabled=false;$('#event').textContent='';const uniq=new Set(Object.values(r)).size;const fb=$('#gFb');
+        if(uniq===4){fb.className='fb good';fb.textContent='Awesome game! Every input has its own action! 🎉';award('build','Game coder! 🎮')}else{fb.className='fb oops';fb.textContent=`Luna did the same thing for different inputs. Give all 4 inputs a different action!`}},1200)},i*1500))};
+};
+
+function fig(p){const y=p.y;let s=`<svg viewBox="0 0 100 140" width="100" height="140"><line x1="5" y1="133" x2="95" y2="133" stroke="#d9def3" stroke-width="4"/><g stroke="#1c2250" stroke-width="5" stroke-linecap="round" fill="none">`;
+  s+=`<circle cx="50" cy="${22+y}" r="10" fill="#fff4c9"/><line x1="50" y1="${32+y}" x2="50" y2="${76+y}"/>`;
+  const sh=45+y;p.arms.forEach(([ax,ay])=>s+=`<line x1="50" y1="${sh}" x2="${ax}" y2="${ay+y}"/>`);
+  p.legs.forEach(seg=>s+=`<polyline points="${seg.map(([a,b])=>a+','+(b+(p.legY??y))).join(' ')}"/>`);return s+'</g></svg>'}
+App.onShow.challenge=()=>{
+  const FR=[{id:'stand',y:0,arms:[[34,68],[66,68]],legs:[[[50,76],[42,130]],[[50,76],[58,130]]],legY:0},
+    {id:'crouch',y:18,arms:[[32,64],[44,72]],legs:[[[50,94],[34,108],[42,132]],[[50,94],[64,108],[58,132]]],legY:0},
+    {id:'air',y:-12,arms:[[30,24],[70,24]],legs:[[[50,64],[42,106]],[[50,64],[58,106]]],legY:0},
+    {id:'land',y:18,arms:[[26,52],[74,52]],legs:[[[50,94],[34,108],[42,132]],[[50,94],[64,108],[58,132]]],legY:0}];
+  // legs given in absolute coords (legY 0)
+  const svg={};FR.forEach(f=>svg[f.id]=fig(f));
+  let seq=[];const L='ABCD';let pool=[];
+  const build=()=>{seq=[];pool=shuffle(FR.map(f=>f.id));$('#frPool').innerHTML=pool.map((id,i)=>`<button class="chip" data-id="${id}">${svg[id]}<small>Frame ${L[i]}</small></button>`).join('');$('#frSeq').innerHTML='';$('#frFb').textContent=''};build();
+  $('#frPool').onclick=e=>{const b=e.target.closest('.chip');if(!b||b.disabled)return;seq.push(b.dataset.id);b.disabled=true;b.style.opacity=.35;
+    $('#frSeq').insertAdjacentHTML('beforeend',`<div class="chip" style="cursor:default">${svg[b.dataset.id]}<small>Step ${seq.length}</small></div>`)};
+  $('#frRst').onclick=build;
+  const right=()=>seq.length===4&&seq[0]==='stand'&&seq[2]==='air';
+  $('#frChk').onclick=()=>{const fb=$('#frFb');if(seq.length<4){fb.className='fb oops';fb.textContent='Put all 4 frames in order first!';return}
+    if(right()){fb.className='fb good';fb.textContent='Correct! Stand → bend knees → fly up → land. The AI can now recognise a JUMP! 🦘';award('challenge','Frame master! 🏆')}else{fb.className='fb oops';fb.textContent='Hmm, that jump looks strange! Press ▶ Play to watch it, then try again.'}};
+  $('#frPlay').onclick=()=>{if(seq.length<2){toast('Choose some frames first!');return}const box=$('#frSeq');const old=box.innerHTML;let k=0;
+    const iv=setInterval(()=>{box.innerHTML=`<div style="margin:auto">${svg[seq[k%seq.length]]}</div>`;k++;if(k>seq.length*3){clearInterval(iv);box.innerHTML=old}},380)};
+  quiz($('#clapQ'),[
+    {q:'Secret code 1: <button class="btn sm" onclick="playClaps([0,.3,1.1])">▶ Play code</button>',o:['👏👏 ⏸ 👏','👏 ⏸ 👏👏','👏👏👏'],a:0,why:'Two quick claps, a pause, then one clap.'},
+    {q:'Secret code 2: <button class="btn sm" onclick="playClaps([0,.8,1.1,1.4])">▶ Play code</button>',o:['👏👏👏 ⏸ 👏','👏 ⏸ 👏👏👏','👏👏 ⏸ 👏👏'],a:1,why:'One clap, a pause, then three quick claps. The AI listens to the gaps too!'}
+  ]);
+};
+
+App.onShow.quiz=()=>quiz($('#quiz'),[
+  {q:'What does an AI use as its "ears"?',o:['A camera','A microphone','A keyboard','A screen'],a:1,why:'A microphone turns sound into numbers for the AI.'},
+  {q:'A sound wave that is very TALL means the sound is…',o:['Loud','Soft','Quiet','Silent'],a:0,why:'Tall waves = loud sounds.'},
+  {q:'A bird tweet is a ___ sound.',o:['Low','High','Silent','Long and slow'],a:1,why:'Bird tweets are high and quick.'},
+  {q:'How does AI notice movement in a video?',o:['It smells it','It looks at what changes between frames','It guesses','It asks the person'],a:1,why:'AI compares one frame with the next to find changes.'},
+  {q:'A frame is…',o:['One picture from a video','A song','A type of robot','A microphone'],a:0,why:'Videos are made of many frames shown very fast.'},
+  {q:'An app wants to use your camera. What should happen first?',o:['It just turns on','It should ask you, and you can say no','It sends the video to everyone','Nothing'],a:1,why:'Apps must ask permission — your pictures and voice are your personal data.'}
+],s=>{if(s>=4)award('quiz','Quiz star! 🎯')});
+</script><script>App.onShow.activity=()=>{
+  const S=[{k:'bird',a:'🐦 Bird',clue:'High, quick chirps = bird.'},{k:'cow',a:'🐄 Cow',clue:'Low and long = cow.'},{k:'clap',a:'👏 Clapping',clue:'Short, sharp sounds = claps.'},{k:'bell',a:'🔔 Doorbell',clue:'"Ding-dong" = doorbell.'}];
+  const order=shuffle(S),opts=shuffle(S.map(s=>s.a));
+  $('#sounds').innerHTML=order.map((s,i)=>`<div class="card center" style="margin:0"><div style="font-size:44px">🎧</div><b>Sound ${i+1}</b><div class="row" style="justify-content:center"><button class="btn sm" data-p="${s.k}">▶ Play</button></div><div class="row" style="justify-content:center" data-i="${i}">${opts.map(o=>`<button class="btn ghost sm" data-o="${o}">${o}</button>`).join('')}</div><p class="clue muted" style="font-size:16px"></p></div>`).join('');
+  const pick={};
+  $('#sounds').onclick=e=>{const b=e.target.closest('[data-p]');if(b){SOUNDS[b.dataset.p]();return}
+    const o=e.target.closest('[data-o]');if(o){const row=o.parentElement;$$('[data-o]',row).forEach(x=>{x.classList.add('ghost');x.classList.remove('moon')});o.classList.remove('ghost');o.classList.add('moon');pick[row.dataset.i]=o.dataset.o}};
+  $('#sndChk').onclick=()=>{const fb=$('#sndFb');if(Object.keys(pick).length<4){fb.className='fb oops';fb.textContent='Choose an answer for every sound!';return}
+    let r=0;order.forEach((s,i)=>{const card=$$('#sounds > .card')[i],ok=pick[i]===s.a;if(ok)r++;card.style.borderColor=ok?'#1fa79c':'#e9604f';$('.clue',card).textContent=ok?'✅ '+s.clue:'❌ Listen again!'});
+    if(r===4){fb.className='fb good';fb.textContent='4 / 4! Great listening! 🎉';award('activity','Sound Detective! 🔊')}else{fb.className='fb oops';fb.textContent=`${r} / 4 correct. Try the red ones again!`}};
+  quiz($('#moveQ'),[
+    {q:'<span style="font-size:44px">🧍 → 🙋 → 🧍 → 🙋</span>',o:['👋 Waving','😴 Sleeping'],a:0,why:'The arm goes up and down — waving!'},
+    {q:'<span style="font-size:44px">🧍 → 🚶 → 🏃</span>',o:['🪑 Sitting down','🏃 Starting to run'],a:1,why:'Standing, walking, running — getting faster!'}]);
+};
+
+App.onShow.build=()=>{
+  const IN=[['clap','👏 hears a clap','hear'],['wave','👋 sees a wave','see']];
+  const ACT={jump:'jumps ⬆️',spin:'spins 🌀',dance:'dances 💃',music:'plays music 🎶'};
+  const opts=Object.entries(ACT).map(([k,v])=>`<option value="${k}">Luna ${v}</option>`).join('');
+  $('#gRules').innerHTML=IN.map(([k,l],i)=>`<div class="rule"><span class="blk when">WHEN Luna ${l}</span><span class="blk do">DO <select data-k="${k}">${opts}</select></span></div>`).join('');
+  const rules=()=>Object.fromEntries($$('#gRules select').map(s=>[s.dataset.k,s.value]));
+  const code=()=>{const r=rules();$('#gCode').innerHTML=IN.map(([k,,t])=>`<span class="k">when</span> ${t}(<span class="s">"${k}"</span>):\n    luna.${r[k]}()`).join('\n')};code();$('#gRules').onchange=code;
+  const L=$('#gLuna'),fx=$('#fx');
+  const DO={jump:()=>L.animate([{transform:'translateY(0)'},{transform:'translateY(-80px)'},{transform:'translateY(0)'}],{duration:700}),
+    spin:()=>L.animate([{transform:'rotate(0)'},{transform:'rotate(360deg)'}],{duration:800}),
+    dance:()=>L.animate([{transform:'rotate(0)'},{transform:'rotate(-15deg)'},{transform:'rotate(15deg)'},{transform:'rotate(0)'}],{duration:900}),
+    music:()=>{fx.textContent='🎶';fx.animate([{opacity:0},{opacity:1},{opacity:0}],{duration:1100});[523,659,784].forEach((f,i)=>tone(f,.2,'triangle',.15,i*.2))}};
+  $('#gRun').onclick=()=>{const r=rules(),seq=['clap','wave','clap','wave'];$('#gRun').disabled=true;$('#gFb').textContent='';
+    seq.forEach((k,i)=>setTimeout(()=>{$('#event').textContent='Luna '+IN.find(x=>x[0]===k)[1];if(k==='clap')playClaps([0]);DO[r[k]]();
+      if(i===seq.length-1)setTimeout(()=>{$('#gRun').disabled=false;$('#event').textContent='';const fb=$('#gFb');
+        if(r.clap!==r.wave){fb.className='fb good';fb.textContent='Super game! Luna knows the difference! 🎉';award('build','Game coder! 🎮')}else{fb.className='fb oops';fb.textContent='Luna did the same thing both times. Choose two different actions!'}},1200)},i*1500))};
+};
+
+App.onShow.challenge=()=>{
+  const FR=[{id:'stand',y:0,arms:[[34,68],[66,68]],legs:[[[50,76],[42,130]],[[50,76],[58,130]]],legY:0},
+    {id:'crouch',y:18,arms:[[32,64],[44,72]],legs:[[[50,94],[34,108],[42,132]],[[50,94],[64,108],[58,132]]],legY:0},
+    {id:'air',y:-12,arms:[[30,24],[70,24]],legs:[[[50,64],[42,106]],[[50,64],[58,106]]],legY:0}];
+  const svg={};FR.forEach(f=>svg[f.id]=fig(f));let seq=[];
+  const build=()=>{seq=[];$('#frPool').innerHTML=shuffle(FR.map(f=>f.id)).map(id=>`<button class="chip" data-id="${id}">${svg[id]}</button>`).join('');$('#frSeq').innerHTML='';$('#frFb').textContent=''};build();
+  $('#frPool').onclick=e=>{const b=e.target.closest('.chip');if(!b||b.disabled)return;seq.push(b.dataset.id);b.disabled=true;b.style.opacity=.35;$('#frSeq').insertAdjacentHTML('beforeend',`<div class="chip" style="cursor:default">${svg[b.dataset.id]}<small>${['First','Middle','Last'][seq.length-1]}</small></div>`)};
+  $('#frRst').onclick=build;
+  $('#frChk').onclick=()=>{const fb=$('#frFb');if(seq.length<3){fb.className='fb oops';fb.textContent='Use all 3 pictures first!';return}
+    if(seq.join()==='stand,crouch,air'){fb.className='fb good';fb.textContent='Correct! Stand → bend → jump up! 🦘';award('challenge','Frame master! 🏆')}else{fb.className='fb oops';fb.textContent='Not quite! Press ▶ Play to see it, then try again.'}};
+  $('#frPlay').onclick=()=>{if(seq.length<2){toast('Choose some pictures first!');return}const box=$('#frSeq'),old=box.innerHTML;let k=0;
+    const iv=setInterval(()=>{box.innerHTML=`<div style="margin:auto">${svg[seq[k%seq.length]]}</div>`;k++;if(k>seq.length*3){clearInterval(iv);box.innerHTML=old}},420)};
+  quiz($('#clapQ'),[{q:'Secret code: <button class="btn sm" onclick="playClaps([0,.45,.9])">▶ Play code</button>',o:['👏 1 clap','👏👏 2 claps','👏👏👏 3 claps'],a:2,why:'Three claps! Luna counts sounds just like you.'}]);
+};
+
+App.onShow.quiz=()=>quiz($('#quiz'),[
+  {q:'What are the AI\'s "ears"?',o:['🎤 A microphone','👟 A shoe'],a:0,why:'A microphone helps the AI hear.'},
+  {q:'What are the AI\'s "eyes"?',o:['📷 A camera','🍎 An apple'],a:0,why:'A camera helps the AI see.'},
+  {q:'A bird tweet is a…',o:['🐦 High sound','🐻 Low sound'],a:0,why:'Bird tweets are high!'},
+  {q:'A video is made of many…',o:['🖼️ Pictures (frames)','🍪 Cookies'],a:0,why:'Lots of pictures shown fast make a video.'},
+  {q:'An app wants to use your camera. What should it do first?',o:['🙋 Ask you','🤫 Turn on secretly'],a:0,why:'Apps should always ask first!'}
+],s=>{if(s>=4)award('quiz','Quiz star! 🎯')});
+</script></body></html>
